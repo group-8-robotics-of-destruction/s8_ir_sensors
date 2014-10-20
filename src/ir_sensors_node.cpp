@@ -9,15 +9,15 @@
 #define TOPIC_ADC           "/arduino/adc"
 #define TOPIC_IR_DISTANCES  "ir_distances"
 
-//TODO: Change!!
+// Double check but those are likely defaults
 #define PARAM_SHORT_TRESHOLD_NEAR_NAME          "short_treshold_near"
-#define PARAM_SHORT_TRESHOLD_NEAR_DEFAULT       600
+#define PARAM_SHORT_TRESHOLD_NEAR_DEFAULT       550
 #define PARAM_SHORT_TRESHOLD_FAR_NAME           "short_treshold_far"
-#define PARAM_SHORT_TRESHOLD_FAR_DEFAULT        100
+#define PARAM_SHORT_TRESHOLD_FAR_DEFAULT        80
 #define PARAM_LONG_TRESHOLD_NEAR_NAME           "long_treshold_near"
-#define PARAM_LONG_TRESHOLD_NEAR_DEFAULT        0
+#define PARAM_LONG_TRESHOLD_NEAR_DEFAULT        500
 #define PARAM_LONG_TRESHOLD_FAR_NAME            "long_treshold_far"
-#define PARAM_LONG_TRESHOLD_FAR_DEFAULT         10000
+#define PARAM_LONG_TRESHOLD_FAR_DEFAULT         90
 #define PARAM_TRESHOLD_VALUE_NAME               "treshold_value"
 #define PARAM_TRESHOLD_VALUE_DEFAULT            -1.0
 
@@ -55,11 +55,18 @@ private:
     }
 
     double transform_short(int adc) {
-        return transform(adc, short_treshold_near, short_treshold_far, 0.04, 0.4);
+        //return transform(adc, short_treshold_near, short_treshold_far, 0.04, 0.4);
+        // Changed these since the transform functions are different between short and long sensors
+        if (adc <= short_treshold_far || adc >= short_treshold_near)
+            return treshold_value;
+        return (1782*pow(adc,-0.9461));
     }
 
     double transform_long(int adc) {
-        return transform(adc, long_treshold_near, long_treshold_far, 0.1, 0.8);
+        //return transform(adc, long_treshold_near, long_treshold_far, 0.1, 0.8);
+        if (adc >= short_treshold_far || adc <= short_treshold_near)
+            return treshold_value;
+        return (23070*pow(adc,-1.295));
     }
 
     double transform(int adc, double treshold_near, double treshold_far, double min_distance, double max_distance) {
