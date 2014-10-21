@@ -44,39 +44,27 @@ private:
 
         distances.front_left = transform_short(adc->ch1);
         distances.front_right = transform_short(adc->ch2);
-        distances.left_front = transform_short(adc->ch3);
-        distances.left_back = transform_short(adc->ch4);
-        distances.right_front = transform_short(adc->ch5);
-        distances.right_back = transform_short(adc->ch6);
-        distances.front_middle = transform_long(adc->ch7);
+        distances.front_middle = transform_long(adc->ch3);
+        distances.left_front = transform_short(adc->ch4);
+        distances.left_back = transform_short(adc->ch5);
+        distances.right_front = transform_short(adc->ch6);
+        distances.right_back = transform_short(adc->ch7);
         distances.back_middle = transform_long(adc->ch8);
 
         ir_distances_publisher.publish(distances);
     }
 
     double transform_short(int adc) {
-        //return transform(adc, short_treshold_near, short_treshold_far, 0.04, 0.4);
-        // Changed these since the transform functions are different between short and long sensors
         if (adc <= short_treshold_far || adc >= short_treshold_near)
             return treshold_value;
         return (1782*pow(adc,-0.9461))/100;
     }
 
     double transform_long(int adc) {
-        //return transform(adc, long_treshold_near, long_treshold_far, 0.1, 0.8);
         if (adc >= long_treshold_far || adc <= long_treshold_near)
             return treshold_value;
         return (23070*pow(adc,-1.295))/100;
     }
-
-//    double transform(int adc, double treshold_near, double treshold_far, double min_distance, double max_distance) {
-//        if(adc <= short_treshold_far || adc >= short_treshold_near) {
-//            return treshold_value;
-//        }
-
-//        //TODO: Change this transform.
-//        return (1.0 - ((double)adc / (treshold_near - treshold_far))) * (max_distance - min_distance) + min_distance;
-//    }
 
     void init_params() {
         add_param(PARAM_SHORT_TRESHOLD_NEAR_NAME, short_treshold_near, PARAM_SHORT_TRESHOLD_NEAR_DEFAULT);
