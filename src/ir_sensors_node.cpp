@@ -14,9 +14,9 @@
 
 // Double check but those are likely defaults
 #define PARAM_SHORT_TRESHOLD_NEAR_NAME          "short_treshold_near"
-#define PARAM_SHORT_TRESHOLD_NEAR_DEFAULT       550
+#define PARAM_SHORT_TRESHOLD_NEAR_DEFAULT       650
 #define PARAM_SHORT_TRESHOLD_FAR_NAME           "short_treshold_far"
-#define PARAM_SHORT_TRESHOLD_FAR_DEFAULT        80
+#define PARAM_SHORT_TRESHOLD_FAR_DEFAULT        60
 #define PARAM_LONG_TRESHOLD_NEAR_NAME           "long_treshold_near"
 #define PARAM_LONG_TRESHOLD_NEAR_DEFAULT        500
 #define PARAM_LONG_TRESHOLD_FAR_NAME            "long_treshold_far"
@@ -140,7 +140,6 @@ private:
     double compute(SlidingAverage & average, int adc, int treshold_near, int treshold_far, std::function<double (int)> transform) {
         if(adc <= treshold_far || adc >= treshold_near) {
             //Out of range.
-            average.reset();
             return treshold_value;
         }
 
@@ -149,7 +148,7 @@ private:
     }
 
     static double transform_short(int adc) {
-        return (1782*pow(adc,-0.9461))/100;
+        return 39*pow(adc,-1.078);
     }
 
     static double transform_long(int adc) {
