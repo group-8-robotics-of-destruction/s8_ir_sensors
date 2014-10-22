@@ -20,7 +20,7 @@
 #define PARAM_LONG_TRESHOLD_NEAR_NAME           "long_treshold_near"
 #define PARAM_LONG_TRESHOLD_NEAR_DEFAULT        500
 #define PARAM_LONG_TRESHOLD_FAR_NAME            "long_treshold_far"
-#define PARAM_LONG_TRESHOLD_FAR_DEFAULT         90
+#define PARAM_LONG_TRESHOLD_FAR_DEFAULT         80
 #define PARAM_TRESHOLD_VALUE_NAME               "treshold_value"
 #define PARAM_TRESHOLD_VALUE_DEFAULT            -1.0
 #define PARAM_NUM_VALUES_FOR_AVERAGE_NAME       "num_values_for_average"
@@ -149,11 +149,13 @@ private:
     }
 
     static double transform_short(int adc) {
-        return 17.8*pow(adc,-0.9461);
+        //return 17.8*pow(adc,-0.9461);
+	return 38.9*pow(adc,-1.0785);
     }
 
     static double transform_long(int adc) {
-        return (23070*pow(adc,-1.295))/100;
+        //return (23070*pow(adc,-1.295))/100;
+	return 152.2*pow(adc,-1.1767);
     }
 
     void init_params() {
