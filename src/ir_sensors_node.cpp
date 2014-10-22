@@ -10,7 +10,7 @@
 #define NODE_NAME           "s8_ir_sensors_node"
 
 #define TOPIC_ADC           "/arduino/adc"
-#define TOPIC_IR_DISTANCES  "ir_distances"
+#define TOPIC_IR_DISTANCES  "/s8/ir_distances"
 
 // Double check but those are likely defaults
 #define PARAM_SHORT_TRESHOLD_NEAR_NAME          "short_treshold_near"
@@ -140,6 +140,7 @@ private:
     double compute(SlidingAverage & average, int adc, int treshold_near, int treshold_far, std::function<double (int)> transform) {
         if(adc <= treshold_far || adc >= treshold_near) {
             //Out of range.
+            average.reset(); //Should we wait 5 out of range to reset?
             return treshold_value;
         }
 
@@ -148,7 +149,7 @@ private:
     }
 
     static double transform_short(int adc) {
-        return 39*pow(adc,-1.078);
+        return 17.8*pow(adc,-0.9461);
     }
 
     static double transform_long(int adc) {
