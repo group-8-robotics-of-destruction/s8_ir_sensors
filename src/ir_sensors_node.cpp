@@ -116,15 +116,15 @@ public:
 private:
     void adc_callback(const ras_arduino_msgs::ADConverter::ConstPtr & adc) {
         s8_msgs::IRDistances distances;
-
-        distances.front_left = compute_short(front_left_avg, adc->ch1);
-        distances.front_right = compute_short(front_right_avg, adc->ch2);
-        distances.front_middle = compute_long(front_middle_avg, adc->ch3);
+	// NB left and back middle not used
+        distances.front_left = compute_long(front_left_avg, adc->ch1);
+        distances.front_right = compute_long(front_right_avg, adc->ch2);
+        distances.front_middle = compute_short(front_middle_avg, adc->ch3);
         distances.left_front = compute_short(left_front_avg, adc->ch4);
         distances.left_back = compute_short(left_back_avg, adc->ch5);
         distances.right_front = compute_short(right_front_avg, adc->ch6);
         distances.right_back = compute_short(right_back_avg, adc->ch7);
-        distances.back_middle = compute_long(back_middle_avg, adc->ch8);
+        distances.back_middle = compute_short(back_middle_avg, adc->ch8);
 
         ir_distances_publisher.publish(distances);
     }
