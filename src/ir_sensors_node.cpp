@@ -24,7 +24,7 @@
 #define PARAM_TRESHOLD_VALUE_NAME               "treshold_value"
 #define PARAM_TRESHOLD_VALUE_DEFAULT            -1.0
 #define PARAM_NUM_VALUES_FOR_AVERAGE_NAME       "num_values_for_average"
-#define PARAM_NUM_VALUES_FOR_AVERAGE_DEFAULT    5
+#define PARAM_NUM_VALUES_FOR_AVERAGE_DEFAULT    1
 
 class IRSensors : public s8::Node {
     class SlidingAverage {
