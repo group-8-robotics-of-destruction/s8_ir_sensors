@@ -1,16 +1,12 @@
+#include <ros/ros.h>
 #include <functional>
 #include <vector>
 
-#include <ros/ros.h>
+#include <s8_ir_sensors/ir_sensors_node.h>
 
 #include <s8_msgs/IRDistances.h>
 #include <s8_common_node/Node.h>
 #include <ras_arduino_msgs/ADConverter.h>
-
-#define NODE_NAME           "s8_ir_sensors_node"
-
-#define TOPIC_ADC           "/arduino/adc"
-#define TOPIC_IR_DISTANCES  "/s8/ir_distances"
 
 // Double check but those are likely defaults
 #define PARAM_SHORT_TRESHOLD_NEAR_NAME          "short_treshold_near"
@@ -21,10 +17,11 @@
 #define PARAM_LONG_TRESHOLD_NEAR_DEFAULT        500
 #define PARAM_LONG_TRESHOLD_FAR_NAME            "long_treshold_far"
 #define PARAM_LONG_TRESHOLD_FAR_DEFAULT         80
-#define PARAM_TRESHOLD_VALUE_NAME               "treshold_value"
-#define PARAM_TRESHOLD_VALUE_DEFAULT            -1.0
 #define PARAM_NUM_VALUES_FOR_AVERAGE_NAME       "num_values_for_average"
 #define PARAM_NUM_VALUES_FOR_AVERAGE_DEFAULT    1
+
+using namespace s8;
+using namespace s8::ir_sensors_node;
 
 class IRSensors : public s8::Node {
     class SlidingAverage {
@@ -97,7 +94,7 @@ class IRSensors : public s8::Node {
     SlidingAverage back_middle_avg;
 
 public:
-    IRSensors() {
+    IRSensors() : treshold_value(TRESHOLD_VALUE) {
         init_params();
         print_params();
         adc_subscriber = nh.subscribe<ras_arduino_msgs::ADConverter>(TOPIC_ADC, 1000, &IRSensors::adc_callback, this);
@@ -116,7 +113,7 @@ public:
 private:
     void adc_callback(const ras_arduino_msgs::ADConverter::ConstPtr & adc) {
         s8_msgs::IRDistances distances;
-	// NB left and back middle not used
+        // NB left and back middle not used
         distances.front_left = compute_long(front_left_avg, adc->ch1);
         distances.front_right = compute_long(front_right_avg, adc->ch2);
         distances.front_middle = compute_short(front_middle_avg, adc->ch3);
@@ -150,12 +147,12 @@ private:
 
     static double transform_short(int adc) {
         //return 17.8*pow(adc,-0.9461);
-	return 38.9*pow(adc,-1.0785);
+       return 38.9*pow(adc,-1.0785);
     }
 
     static double transform_long(int adc) {
         //return (23070*pow(adc,-1.295))/100;
-	return 152.2*pow(adc,-1.1767);
+       return 152.2*pow(adc,-1.1767);
     }
 
     void init_params() {
@@ -163,7 +160,6 @@ private:
         add_param(PARAM_SHORT_TRESHOLD_FAR_NAME, short_treshold_far, PARAM_SHORT_TRESHOLD_FAR_DEFAULT);
         add_param(PARAM_LONG_TRESHOLD_NEAR_NAME, long_treshold_near, PARAM_LONG_TRESHOLD_NEAR_DEFAULT);
         add_param(PARAM_LONG_TRESHOLD_FAR_NAME, long_treshold_far, PARAM_LONG_TRESHOLD_FAR_DEFAULT);
-        add_param(PARAM_TRESHOLD_VALUE_NAME, treshold_value, PARAM_TRESHOLD_VALUE_DEFAULT);
         add_param(PARAM_NUM_VALUES_FOR_AVERAGE_NAME, num_values_for_average, PARAM_NUM_VALUES_FOR_AVERAGE_DEFAULT);
     }
 };
