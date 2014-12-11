@@ -64,27 +64,6 @@ class IRSensors : public s8::Node {
             return average / size;
         }
 
-        double median() {
-            if(!filled) {
-                return -2.0;
-            }
-
-            double median;
-
-            sort(values.begin(), values.end());
-
-            if (size  % 2 == 0)
-            {
-                median = (values[size / 2 - 1] + values[size / 2]) / 2;
-            }
-            else 
-            {
-                median = values[size / 2];
-            }
-
-            return median;
-        }
-
         bool is_full() {
             return filled;
         }
@@ -138,13 +117,12 @@ private:
         distances.front_left = compute_long(front_left_avg, adc->ch1);
         distances.front_right = compute_long(front_right_avg, adc->ch2);
         distances.front_middle = compute_short(front_middle_avg, adc->ch3);
-        distances.left_front = compute_ch4(left_front_avg, adc->ch4);
+        distances.left_front = compute_short(left_front_avg, adc->ch4);
         distances.left_back = compute_short(left_back_avg, adc->ch5);
-        distances.right_front = compute_short(right_front_avg, adc->ch6);
+        distances.right_front = compute_ch6(right_front_avg, adc->ch6);
         distances.right_back = compute_ch7(right_back_avg, adc->ch7);
         distances.back_middle = compute_short(back_middle_avg, adc->ch8);
 
-	ROS_INFO("CH4 Old: %lf, CH4 New: %lf", transform_short(adc->ch4), transform_ch4(adc->ch4));
         ROS_INFO("CH6 Old: %lf, CH6 New: %lf", transform_short(adc->ch6), transform_ch6(adc->ch6));
         ROS_INFO("CH7 Old: %lf, CH7 New: %lf", transform_short(adc->ch7), transform_ch7(adc->ch7));
 
@@ -153,10 +131,6 @@ private:
 
     double compute_short(SlidingAverage & average, int adc) {
         return compute(average, adc, short_treshold_near, short_treshold_far, &IRSensors::transform_short);
-    }
-
-    double compute_ch4(SlidingAverage & average, int adc) {
-        return compute(average, adc, short_treshold_near, short_treshold_far, &IRSensors::transform_ch4);
     }
 
     double compute_ch6(SlidingAverage & average, int adc) {
@@ -175,14 +149,14 @@ private:
     }
 
     double compute(SlidingAverage & average, int adc, int treshold_near, int treshold_far, std::function<double (int)> transform) {
-        // if(adc <= treshold_far || adc >= treshold_near) {
-        //     //Out of range.
-        //     average.reset(); //Should we wait 5 out of range to reset?
-        //     return treshold_value;
-        // }
+        if(adc <= treshold_far || adc >= treshold_near) {
+            //Out of range.
+            average.reset(); //Should we wait 5 out of range to reset?
+            return treshold_value;
+        }
 
         average.add(transform(adc));
-        return average.median();
+        return average.average();
     }
 
     static double transform_short(int adc) {
@@ -195,18 +169,12 @@ private:
        return 152.2*pow(adc,-1.1767);
     }
 
-    static double transform_ch4(int adc){
-        return 46.9*pow(adc, -1.0785) - 0.01; 
+    static double transform_ch6(int adc) {
+	return 13.93 * pow(adc, -0.886);
     }
 
-    static double transform_ch6(int adc) {
-	return 15.8 * pow(adc, -0.9114);
-	//return 9.391 * pow(adc, -0.7653) - 0.035;
-    }
-    
     static double transform_ch7(int adc) {
 	return 4619 * pow(adc, -2.014) + 0.035;
-	//return 16210 * pow(adc, -2.275) + 0.043;
     } 
 
     void init_params() {
