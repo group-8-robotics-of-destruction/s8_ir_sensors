@@ -18,7 +18,7 @@
 #define PARAM_LONG_TRESHOLD_FAR_NAME            "long_treshold_far"
 #define PARAM_LONG_TRESHOLD_FAR_DEFAULT         80
 #define PARAM_NUM_VALUES_FOR_AVERAGE_NAME       "num_values_for_average"
-#define PARAM_NUM_VALUES_FOR_AVERAGE_DEFAULT    1
+#define PARAM_NUM_VALUES_FOR_AVERAGE_DEFAULT    5
 
 using namespace s8;
 using namespace s8::ir_sensors_node;
